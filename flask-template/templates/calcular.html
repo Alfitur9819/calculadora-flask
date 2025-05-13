@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado de la Cotización</title>
+</head>
+<body>
+    <h1>Resultado de la Cotización</h1>
+    <p>La cotización de la unidad: <strong>{{ nombreUnidad }}</strong> es la siguiente:</p>
+    <ul>
+        <li>Precio de lista: <strong>${{ "{:,.2f}".format(precio) }}</strong></li>
+        <li>Enganche: <strong>${{ "{:,.2f}".format(enganche) }}</strong></li>
+        <li>Una mensualidad de <strong>${{ "{:,.2f}".format(mensualidad) }}</strong> a <strong>{{ meses }}</strong> meses.</li>
+    </ul>
+    <a href="/">Volver</a>
+</body>
+</html>

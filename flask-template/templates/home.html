@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Interés</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+    <script>
+        // Función para formatear números con separadores de miles
+        function formatCurrency(input) {
+            let value = input.value.replace(/[^0-9]/g, '');
+            value = new Intl.NumberFormat('es-MX').format(value);
+            input.value = value ? `$${value}` : '';
+        }
+
+        // Función para eliminar el formato antes de enviar el formulario
+        function removeCurrencyFormatting(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        // Validar que solo se ingresen números en los campos de entrada
+        function validateNumericInput(event) {
+            const key = event.key;
+            if (!/^[0-9]$/.test(key) && key !== "Backspace" && key !== "Delete" && key !== "ArrowLeft" && key !== "ArrowRight") {
+                event.preventDefault();
+            }
+        }
+
+        // Función para calcular el enganche recomendado
+        function calculateRecommendedEnganche() {
+            const unidad = document.getElementById('unidad').value;
+            const precioInput = document.getElementById('precio');
+            const engancheInput = document.getElementById('enganche');
+
+            // Eliminar formato de moneda para obtener el valor numérico
+            const precio = parseInt(precioInput.value.replace(/[^0-9]/g, ''), 10);
+
+            if (unidad === 'Auto') {
+                if (precio >= 100000 && precio <= 149999) {
+                    engancheInput.value = '$18,000';
+                } else if (precio >= 150000 && precio <= 199999) {
+                    engancheInput.value = '$25,000';
+                } else if (precio >= 200000 && precio <= 249999) {
+                    engancheInput.value = '$30,000';
+                } else if (precio >= 250000 && precio <= 299999) {
+                    engancheInput.value = '$35,000';
+                } else if (precio >= 300000 && precio <= 1000000) {
+                    engancheInput.value = '$40,000';
+                } else {
+                    engancheInput.value = ''; // Sin recomendación
+                }
+            } else if (unidad === 'Moto') {
+                if (precio >= 50000 && precio <= 99999) {
+                    engancheInput.value = '$17,000';
+                } else if (precio >= 100000 && precio <= 150999) {
+                    engancheInput.value = '$22,000';
+                } else if (precio >= 150000 && precio <= 199999) {
+                    engancheInput.value = '$27,000';
+                } else if (precio >= 200000 && precio <= 249999) {
+                    engancheInput.value = '$32,000';
+                } else if (precio >= 250000 && precio <= 299999) {
+                    engancheInput.value = '$37,000';
+                } else if (precio >= 300000 && precio <= 1000000) {
+                    engancheInput.value = '$45,000';
+                } else {
+                    engancheInput.value = ''; // Sin recomendación
+                }
+            }
+        }
+
+        // Función para copiar los resultados al portapapeles
+        function copyResults() {
+            const resultSection = document.getElementById('resultSection');
+            const range = document.createRange();
+            range.selectNode(resultSection);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('Resultados copiados al portapapeles');
+        }
+    </script>
+</head>
+<body>
+    <h1>Calculadora de Interés</h1>
+    <form action="/" method="POST" onsubmit="removeCurrencyFormatting(document.getElementById('precio')); removeCurrencyFormatting(document.getElementById('enganche'));">
+        <label for="unidad">Selecciona la unidad:</label>
+        <select name="unidad" id="unidad" onchange="calculateRecommendedEnganche()" required>
+            <option value="Auto">Auto</option>
+            <option value="Moto">Moto</option>
+        </select>
+        <br><br>
+    
+        <label for="nombreUnidad">Modelo de la unidad:</label>
+        <input type="text" id="nombreUnidad" name="nombreUnidad" required>
+        <br><br>
+    
+        <label for="precio">Precio total de la unidad:</label>
+        <input type="text" id="precio" name="precio" oninput="formatCurrency(this); calculateRecommendedEnganche()" onkeypress="validateNumericInput(event)" required>
+        <br><br>
+    
+        <label for="enganche">Monto del enganche:</label>
+        <input type="text" id="enganche" name="enganche" oninput="formatCurrency(this)" onkeypress="validateNumericInput(event)" required>
+        <br><br>
+    
+        <label for="meses">Número de meses a financiar:</label>
+        <input type="number" id="meses" name="meses" onkeypress="validateNumericInput(event)" required>
+        <br><br>
+    
+        <button type="submit">Calcular</button>
+    </form>
+
+    {% if nombreUnidad %}
+    <div id="resultSection">
+        <h2>Resultado de la Cotización</h2>
+        <p>La cotización de la unidad: <strong>{{ nombreUnidad }}</strong> es la siguiente:</p>
+        <ul>
+            <li>Precio de lista: <strong>${{ "{:,.2f}".format(precio) }}</strong></li>
+            <li>Enganche: <strong>${{ "{:,.2f}".format(enganche) }}</strong></li>
+            <li>Una mensualidad de <strong>${{ "{:,.2f}".format(mensualidad) }}</strong> a <strong>{{ meses }}</strong> meses.</li>
+        </ul>
+    </div>
+    <button onclick="copyResults()">Copiar Resultados</button>
+    {% endif %}
+
+
+    <footer style="text-align: center; margin-top: 20px; font-size: 14px; color: #555;">
+        <p>Esta aplicación web fue desarrollada por <strong>Alfonso Iturbide</strong>.</p>
+        <p>Contacto: <a href="https://wa.me/5654978341" target="_blank" style="color: #4CAF50; text-decoration: none;">Enviar mensaje por WhatsApp</a></p>
+    </footer>
+</body>
+</html>
